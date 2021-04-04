@@ -25,46 +25,49 @@ class DFT:
         return idft
 
     @staticmethod
-    def FFT_Cooley_Tukey(x, size):
+    def FFT_Cooley_Tukey(x):
         x = np.asarray(x, dtype=complex)
         N = x.shape[0]
 
         if N % 2 != 0:
-            raise ValueError("Size of x must be even")
-        elif N <= size:
+            raise ValueError("Size of x must be a power of 2!")
+        elif N <= 2:
             return DFT.DFT_Slow_One_Dimension(x)
         else:
-            fft_even = DFT.FFT_Cooley_Tukey(x[::2], size)
-            fft_odd = DFT.FFT_Cooley_Tukey(x[1::2], size)
+            fft_even = DFT.FFT_Cooley_Tukey(x[::2])
+            fft_odd = DFT.FFT_Cooley_Tukey(x[1::2])
             fft_Cooley_Tukey = np.zeros(N, dtype=complex)
             half = int(N / 2)
             factor = np.exp(-2j * np.pi * np.arange(half) / N)
             for j in range(half):
                 fft_Cooley_Tukey[j] = fft_even[j] + factor[j] * fft_odd[j]
-                fft_Cooley_Tukey[j + half] = fft_even[j] - factor[j] * fft_odd[j]
+                fft_Cooley_Tukey[j + half] = fft_even[j] - \
+                    factor[j] * fft_odd[j]
 
             return fft_Cooley_Tukey
 
     @staticmethod
-    def FFT_Cooley_Tukey_Inverse(x, size):
+    def FFT_Cooley_Tukey_Inverse(x):
         x = np.asarray(x, dtype=complex)
         N = x.shape[0]
 
         if N % 2 != 0:
-            raise ValueError("Size of x must be even")
-        elif N <= size:
+            raise ValueError("Size of x must be a power of 2!")
+        elif N <= 2:
             return DFT.DFT_Slow_One_Dimension_Inverse(x)
         else:
-            fft_even = DFT.FFT_Cooley_Tukey_Inverse(x[::2], size)
-            fft_odd = DFT.FFT_Cooley_Tukey_Inverse(x[1::2], size)
-            fft_Cooley_Tukey = np.zeros(N, dtype=complex)
+            ifft_even = DFT.FFT_Cooley_Tukey_Inverse(x[::2])
+            ifft_odd = DFT.FFT_Cooley_Tukey_Inverse(x[1::2])
+            ifft_Cooley_Tukey = np.zeros(N, dtype=complex)
             half = int(N / 2)
             factor = np.exp(2j * np.pi * np.arange(half) / N)
             for j in range(half):
-                fft_Cooley_Tukey[j] = (fft_even[j] + factor[j] * fft_odd[j]) * (half / N)
-                fft_Cooley_Tukey[j + half] = (fft_even[j] - factor[j] * fft_odd[j]) * (half / N)
+                ifft_Cooley_Tukey[j] = (
+                    ifft_even[j] + factor[j] * ifft_odd[j]) * (half / N)
+                ifft_Cooley_Tukey[j + half] = (ifft_even[j] -
+                                               factor[j] * ifft_odd[j]) * (half / N)
 
-            return fft_Cooley_Tukey
+            return ifft_Cooley_Tukey
 
     # @staticmethod
     # def FFT_Cooley_Tukey_Inverse(x):
@@ -149,20 +152,23 @@ class DFT:
         N, M = x.shape
         fft_two_dimensions = np.empty((N, M), dtype=complex)
 
-        # for m in range(M):
-        #     for n in range(N):
-        #         fft_two_dimensions[n, m] = DFT.FFT_Cooley_Tukey(x[n, m])
-
         for n in range(N):
             fft_two_dimensions[n, :] = DFT.FFT_Cooley_Tukey(x[n, :])
         for m in range(M):
-            fft_two_dimensions[:, m] = DFT.FFT_Cooley_Tukey(
-                fft_two_dimensions[:, m])
-        # for m in range(M):
-        #     fft_two_dimensions[:, m] = DFT.FFT_Cooley_Tukey(x[:, m])
-        # for n in range(N):
-        #     fft_two_dimensions[n, :] = DFT.FFT_Cooley_Tukey(fft_two_dimensions[n, :])
+            fft_two_dimensions[:, m] = DFT.FFT_Cooley_Tukey(fft_two_dimensions[:, m])
         return fft_two_dimensions
+
+    @staticmethod
+    def FFT_Two_Dimensions_Inverse(x):
+        x = np.asarray(x, dtype=complex)
+        N, M = x.shape
+        ifft_two_dimensions = np.empty((N, M), dtype=complex)
+
+        for n in range(N):
+            ifft_two_dimensions[n, :] = DFT.FFT_Cooley_Tukey_Inverse(x[n, :])
+        for m in range(M):
+            ifft_two_dimensions[:, m] = DFT.FFT_Cooley_Tukey_Inverse(ifft_two_dimensions[:, m])
+        return ifft_two_dimensions
 
     @staticmethod
     def test():
@@ -206,41 +212,41 @@ class DFT:
         # # DFT.FFT_Cooley_Tukey(x,2)
         # end = time.time()
         # print(end - start)
-  
+
         # start = time.time()
         # print("FFT_Cooley_Tukey : 4")
         # print(DFT.FFT_Cooley_Tukey(x, 4))
         # # DFT.FFT_Cooley_Tukey(x,2)
         # end = time.time()
         # print(end - start)
-  
+
         # start = time.time()
         # print("FFT_Cooley_Tukey: 8")
         # print(DFT.FFT_Cooley_Tukey(x, 8))
         # # DFT.FFT_Cooley_Tukey(x,8)
         # end = time.time()
         # print(end - start)
-  
+
         # start = time.time()
         # print("FFT_Cooley_Tukey: 16")
         # print(DFT.FFT_Cooley_Tukey(x, 16))
         # # DFT.FFT_Cooley_Tukey(x,16)
         # end = time.time()
         # print(end - start)
-  
+
         # start = time.time()
         # print("FFT_Cooley_Tukey: 32")
         # print(DFT.FFT_Cooley_Tukey(x, 32))
         # # DFT.FFT_Cooley_Tukey(x,32)
         # end = time.time()
         # print(end - start)
-  
+
         # print("FFT_Cooley_Tukey_Inverse: 2")
         # start = time.time()
         # print(DFT.FFT_Cooley_Tukey_Inverse(x, 2))
         # end = time.time()
         # print(end - start)
-        
+
         # print("FFT_Cooley_Tukey_Inverse: 4")
         # start = time.time()
         # print(DFT.FFT_Cooley_Tukey_Inverse(x, 4))
@@ -265,7 +271,6 @@ class DFT:
         # end = time.time()
         # print(end - start)
 
-
         # start = time.time()
         # print("FFT_Cooley_Tukey_Inverse___")
         # print(DFT.ifft(x))
@@ -274,14 +279,21 @@ class DFT:
 
         # print(fast_one_dimension(x))
 
-        # a2 = np.random.rand(32, 32)
-        # fft2 = np.fft.fft2(a2)
-        # fft2d = DFT.FFT_Two_Dimensions(a2)
+        a2 = np.random.rand(4, 4)
+        fft2 = np.fft.fft2(a2)
+        fft2d = DFT.FFT_Two_Dimensions(a2)
+        ifft2 = np.fft.ifft2(a2)
+        ifft2d = DFT.FFT_Two_Dimensions_Inverse(a2)
 
-        # print("not mine")
-        # print(fft2)
-        # print("mine")
-        # print(fft2d)
+        print("not mine")
+        print(fft2)
+        print("mine")
+        print(fft2d)
+
+        print("inverse not mine")
+        print(ifft2)
+        print("inverse mine")
+        print(ifft2d)
 
 
 def main():
