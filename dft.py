@@ -296,10 +296,10 @@ class DFT:
         print(ifft2d)
 
 
-def main():
-    print("Hello World!")
-    DFT.test()
+# def main():
+#     print("Hello World!")
+#     DFT.test()
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
