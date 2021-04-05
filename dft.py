@@ -146,6 +146,34 @@ class DFT:
     #     return fft_Cooley_Tukey
 
     @staticmethod
+    def DFT_Two_Dimensions(x):
+        x = np.asarray(x, dtype=complex)
+        N, M = x.shape
+        dft_two_dimensions = np.zeros((N, M), dtype=complex)
+
+        for i in range(N):
+            for j in range(M):
+                for k in range(M):
+                    for l in range(N):
+                        dft_two_dimensions[j, i] += x[k, l] * np.exp(-2j * np.pi *((j * k / M) + (i * l / N)))
+
+        return dft_two_dimensions
+
+    @staticmethod
+    def DFT_Two_Dimensions_Inverse(x):
+        x = np.asarray(x, dtype=complex)
+        N, M = x.shape
+        idft_two_dimensions = np.zeros((N, M), dtype=complex)
+
+        for i in range(N):
+            for j in range(M):
+                for k in range(M):
+                    for l in range(N):
+                        idft_two_dimensions[j, i] += x[k, l] * np.exp(2j * np.pi *((j * k / M) + (i * l / N))) / (M * N)
+
+        return idft_two_dimensions
+
+    @staticmethod
     def FFT_Two_Dimensions(x):
         x = np.asarray(x, dtype=complex)
         N, M = x.shape
@@ -288,23 +316,26 @@ class DFT:
 
         # print(fast_one_dimension(x))
 
-        # a2 = np.random.rand(4, 5)
+        a2 = np.random.rand(4, 4)
         # anew = np.zeros((4,8))
         # anew[:4, :5] = a2
-        # # fft2 = np.fft.fft2(a2)
-        # # fft2d = DFT.FFT_Two_Dimensions(a2)
-        # ifft2 = np.fft.ifft2(anew)
-        # ifft2d = DFT.FFT_Two_Dimensions_Inverse(anew)
+        # fft2 = np.fft.fft2(a2)
+        # fft2d = DFT.FFT_Two_Dimensions(a2)
+        # fft2dd = DFT.DFT_Two_Dimensions(a2)
+        ifft2 = np.fft.ifft2(a2)
+        ifft2d = DFT.FFT_Two_Dimensions_Inverse(a2)
+        ifft2d = DFT.DFT_Two_Dimensions_Inverse(a2)
 
         # print("not mine")
         # print(fft2)
         # print("mine")
         # print(fft2d)
+        # print(fft2dd)
 
-        # print("inverse not mine")
-        # print(ifft2)
-        # print("inverse mine")
-        # print(ifft2d)
+        print("inverse not mine")
+        print(ifft2)
+        print("inverse mine")
+        print(ifft2d)
 
 
 def main():
