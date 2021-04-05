@@ -106,7 +106,8 @@ def main():
         ax[0].set_title("Original")
         ax[1].imshow(denoised_img, "gray")
         ax[1].set_title("Denoising Using Only Cutoff Coefficient of 0.09")
-        fig.suptitle("Mode 2: Denoised Image Using 2-Dimensional Fast Fourier Transform")
+        fig.suptitle(
+            "Mode 2: Denoised Image Using 2-Dimensional Fast Fourier Transform")
         plt.show()
 
     # Mode 3
@@ -325,9 +326,10 @@ def main():
 
         # Plotting both 2D FFT and 2D DFT.
         plt.errorbar(x_axis_data, fft_data, yerr=(fft_data_std*2), fmt='r--')
-        plt.errorbar(x_axis_data[0:2], dft_data,yerr=(dft_data_std*2), fmt='g--')
+        plt.errorbar(x_axis_data[0:2], dft_data,
+                     yerr=(dft_data_std*2), fmt='g--')
         plt.show()
-    
+
     # Invalid Mode.
     else:
         print("Error:\t There are only 4 modes that this program works in.")
