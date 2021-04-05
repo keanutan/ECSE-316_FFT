@@ -1,6 +1,7 @@
 import numpy as np
 import time
 
+
 class DFT:
 
     @staticmethod
@@ -8,6 +9,8 @@ class DFT:
         x = np.asarray(x, dtype=complex)
         N = x.shape[0]
         dft = np.zeros(N, dtype=complex)
+
+        # Following the lab instructions.
         for k in range(N):
             for n in range(N):
                 dft[k] += x[n] * np.exp(-2j * np.pi * k * n / N)
@@ -18,6 +21,8 @@ class DFT:
         x = np.asarray(x, dtype=complex)
         N = x.shape[0]
         idft = np.zeros(N, dtype=complex)
+
+        # Following the lab instructions.
         for n in range(N):
             for k in range(N):
                 idft[n] += x[k] * np.exp(2j * np.pi * k * n / N) / N
@@ -28,6 +33,7 @@ class DFT:
         x = np.asarray(x, dtype=complex)
         N = x.shape[0]
 
+        # Using Cooley-Tukey FFT algorithm.
         if N % 2 != 0:
             raise ValueError("Size of x must be a power of 2!")
         if N <= 2:
@@ -50,6 +56,7 @@ class DFT:
         x = np.asarray(x, dtype=complex)
         N = x.shape[0]
 
+        # Using Cooley-Tukey Inverse FFT algorithm.
         if N % 2 != 0:
             raise ValueError("Size of x must be a power of 2!")
         if N <= 2:
@@ -74,6 +81,7 @@ class DFT:
         N, M = x.shape
         dft_two_dimensions = np.zeros((N, M), dtype=complex)
 
+        # Using the 2D DFT algorithm.
         for i in range(N):
             for j in range(M):
                 for k in range(M):
@@ -89,6 +97,7 @@ class DFT:
         N, M = x.shape
         idft_two_dimensions = np.zeros((N, M), dtype=complex)
 
+        # Using the 2D Inverse DFT algorithm.
         for i in range(N):
             for j in range(M):
                 for k in range(M):
@@ -104,6 +113,7 @@ class DFT:
         N, M = x.shape
         fft_two_dimensions = np.zeros((N, M), dtype=complex)
 
+        # Applying the Cooley-Tuckey FFT to 2D.
         for n in range(N):
             fft_two_dimensions[n, :] = DFT.FFT_Cooley_Tukey(x[n, :])
         for m in range(M):
@@ -117,6 +127,7 @@ class DFT:
         N, M = x.shape
         ifft_two_dimensions = np.zeros((N, M), dtype=complex)
 
+        # Applying the Cooley-Tuckey Inverse FFT to 2D.
         for n in range(N):
             ifft_two_dimensions[n, :] = DFT.FFT_Cooley_Tukey_Inverse(x[n, :])
         for m in range(M):
