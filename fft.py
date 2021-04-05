@@ -20,9 +20,7 @@ def closestPowerOfTwo(n):
 
 def main():
 
-    # im_raw = plt.imread("moonlanding.png").astype(float)
-    # print(im_raw.shape)
-
+    # Getting command line input.
     command = None
     try:
         command = parser()
@@ -33,6 +31,7 @@ def main():
     mode = command.mode
     image = command.image
 
+    # Mode 1
     if mode == 1:
 
         # Opening the image.
@@ -51,29 +50,24 @@ def main():
 
         # Computing the 2D FFT of the image.
         transient_img = DFT.FFT_Two_Dimensions(updated_image)
-        perf_img = np.fft.fft2(updated_image)
 
         # Converting the array into an image for resizing using PIL.
         temp = Image.fromarray(np.log(1+np.abs(transient_img)))
-        tmp = Image.fromarray(np.log(1+np.abs(perf_img)))
 
         # Resizing image to original size and converting back into array to be able to .imshow()
         final_img = temp.resize((img.shape[1], img.shape[0]), Image.ANTIALIAS)
         final_img = np.array(final_img)
-        finalimg = tmp.resize((img.shape[1], img.shape[0]), Image.ANTIALIAS)
-        finalimg = np.array(finalimg)
 
         # Creating the plot presentation.
-        fig, ax = plt.subplots(1, 3)
+        fig, ax = plt.subplots(1, 2)
         ax[0].imshow(img, "gray")
         ax[0].set_title("Original")
         ax[1].imshow(final_img, "gray")
         ax[1].set_title("2D FFT")
-        ax[2].imshow(finalimg, "gray")
-        ax[2].set_title("2D FFT Using Built-In np.fft.fft2 Function")
         fig.suptitle("Mode 1: 2-Dimensional Fast Fourier Transform of Image")
         plt.show()
 
+    # Mode 2
     elif mode == 2:
 
         # Opening the image.
@@ -90,17 +84,6 @@ def main():
             (closestPowerOfTwo(img.shape[0]), closestPowerOfTwo(img.shape[1])))
         updated_image[:img.shape[0], :img.shape[1]] = img
 
-
-        # 
-        trans = DFT.FFT_Two_Dimensions(updated_image)
-        abs_vals = np.sort(np.abs(trans.flatten()))
-        perc = 0.97 * abs_vals.shape[0]
-        cut = abs_vals[int(perc)]
-        np.place(trans, abs(trans) < cut, [0])
-        done = DFT.FFT_Two_Dimensions_Inverse(trans).real
-        comp = done[:img.shape[0], :img.shape[1]]
-        # 
-
         # Computing the 2D FFT of the image.
         transient_img = DFT.FFT_Two_Dimensions(updated_image)
         I, J = transient_img.shape
@@ -114,22 +97,19 @@ def main():
 
         # Printing denoising data.
         threshold_inverse = 1-threshold
-        print("Fraction of Non-Zero Coefficients {} Representing ({}, {}) out of ({}, {}) Pixels".format(threshold_inverse**2, int(I*threshold_inverse), int(J*threshold_inverse), I, J))
+        print("Fraction of Non-Zero Coefficients {} Representing ({}, {}) out of ({}, {}) Pixels".format(
+            threshold_inverse**2, int(I*threshold_inverse), int(J*threshold_inverse), I, J))
 
         # Creating the plot presentation.
-        fig, ax = plt.subplots(1, 3)
+        fig, ax = plt.subplots(1, 2)
         ax[0].imshow(img, "gray")
         ax[0].set_title("Original")
         ax[1].imshow(denoised_img, "gray")
         ax[1].set_title("Denoising Using Only Cutoff Coefficient of 0.09")
-        # 
-        ax[2].imshow(comp, "gray")
-        ax[2].set_title("Denoising Using 97% Compression")
-        # 
-        fig.suptitle(
-            "Mode 2: Denoised Image Using 2-Dimensional Fast Fourier Transform")
+        fig.suptitle("Mode 2: Denoised Image Using 2-Dimensional Fast Fourier Transform")
         plt.show()
 
+    # Mode 3
     elif mode == 3:
 
         # Opening the image.
@@ -157,7 +137,7 @@ def main():
         abs_values = np.sort(np.abs(transient_img_a.flatten()))
         percentile_a = 0.20 * abs_values.shape[0]
         percentile_b = 0.40 * abs_values.shape[0]
-        percentile_c = 0.80 * abs_values.shape[0]
+        percentile_c = 0.60 * abs_values.shape[0]
         percentile_d = 0.80 * abs_values.shape[0]
         percentile_e = 0.95 * abs_values.shape[0]
         percentile_f = abs_values.shape[0] - 1
@@ -181,21 +161,21 @@ def main():
         count_d = 0
         count_e = 0
         count_f = 0
-        
+
         I, J = transient_img_a.shape
         for i in range(I):
             for j in range(J):
-                if np.abs(transient_img_a[i,j]) == 0:
-                    count_a+=1
-                if np.abs(transient_img_b[i,j]) == 0:
-                    count_b+=1
-                if np.abs(transient_img_c[i,j]) == 0:
-                    count_c+=1
-                if np.abs(transient_img_d[i,j]) == 0:
-                    count_d+=1
-                if np.abs(transient_img_e[i,j]) == 0:
-                    count_e+=1
-                
+                if np.abs(transient_img_a[i, j]) == 0:
+                    count_a += 1
+                if np.abs(transient_img_b[i, j]) == 0:
+                    count_b += 1
+                if np.abs(transient_img_c[i, j]) == 0:
+                    count_c += 1
+                if np.abs(transient_img_d[i, j]) == 0:
+                    count_d += 1
+                if np.abs(transient_img_e[i, j]) == 0:
+                    count_e += 1
+
         # Printing the number of non-zero Fourier coefficients for each compression level.
         print("For 20% compression, we have {} non-zero Fourier coefficients.".format(524288 - count_a))
         print("For 40% compression, we have {} non-zero Fourier coefficients.".format(524288 - count_b))
@@ -231,60 +211,71 @@ def main():
         done_e = DFT.FFT_Two_Dimensions_Inverse(transient_img_e).real
         compressed_img_e = done_e[:img.shape[0], :img.shape[1]]
 
-
         # Creating the plot presentation.
         fig, ax = plt.subplots(2, 3)
-        ax[0,0].imshow(img, "gray")
-        ax[0,0].set_title("Original")
+        ax[0, 0].imshow(img, "gray")
+        ax[0, 0].set_title("Original")
 
-        ax[0,1].imshow(compressed_img_a, "gray")
-        ax[0,1].set_title("20% Compression")
+        ax[0, 1].imshow(compressed_img_a, "gray")
+        ax[0, 1].set_title("20% Compression")
 
-        ax[0,2].imshow(compressed_img_b, "gray")
-        ax[0,2].set_title("40% Compression")
+        ax[0, 2].imshow(compressed_img_b, "gray")
+        ax[0, 2].set_title("40% Compression")
 
-        ax[1,0].imshow(compressed_img_c, "gray")
-        ax[1,0].set_title("60% Compression")
+        ax[1, 0].imshow(compressed_img_c, "gray")
+        ax[1, 0].set_title("60% Compression")
 
-        ax[1,1].imshow(compressed_img_d, "gray")
-        ax[1,1].set_title("80% Compression")
+        ax[1, 1].imshow(compressed_img_d, "gray")
+        ax[1, 1].set_title("80% Compression")
 
-        ax[1,2].imshow(compressed_img_e, "gray")
-        ax[1,2].set_title("95% Compression")
+        ax[1, 2].imshow(compressed_img_e, "gray")
+        ax[1, 2].set_title("95% Compression")
 
         fig.suptitle(
             "Mode 3: Compression")
         plt.show()
 
+    # Mode 4
     elif mode == 4:
-        print("hello")
+
+        # Setting up the plot.
         fig, ax = plt.subplots()
         ax.set_xlabel('Problem Size NxN')
         ax.set_ylabel('Runtime In Seconds')
-        ax.set_title('Title')
+        ax.set_title('Mode 3: Runtime Over Problem Size')
 
-
-
+        # Setting up our testing parameters with initial exponent, the number of trials per input,
+        # the counter for adding plot points at each exponent, and the initial data arrays for
+        # 2D FFT and 2D DFT.
 
         exponent = 5
         trials = 10
-        dft_counter = 0
-        fft_counter = 0
         counter = 0
-        # dft_data = np.zeros((6,6))
         x_axis_data = np.zeros(6)
-        # y_axis_data = np.zeros(5)
         fft_data = np.zeros(6)
         fft_data_std = np.zeros(6)
+
+        # Note: We only take two plot points for the 2D DFT because computing times for inputs with size >= 2^7
+        #       take extremely long to compute.
         dft_data = np.zeros(2)
         dft_data_std = np.zeros(2)
-        # x_values = np.zeros(3)
+
+        # While loop that goes through inputs of size 2^5 to 2^10.
         while exponent <= 10:
-            x = np.random.rand(2**exponent, 2**exponent)
+
+            # Anouncing start of trials for particular input.
+            print("Starting trials with input of size " +
+                  str(2**exponent) + "x" + str(2**exponent))
+
+            # Data arrays for both 2D Fourier Transforms.
             runtimes_dft = np.zeros(10)
             runtimes_fft = np.zeros(10)
-            print("Starting trials with input of size " + str(2**exponent) + "x" + str(2**exponent))
+
+            # Doing 10 independent trials with 10 different inputs.
             for i in range(10):
+
+                # Setting up the random 2D array of size 2^exponent x 2^exponent.
+                x = np.random.rand(2**exponent, 2**exponent)
 
                 start = time.time()
                 DFT.FFT_Two_Dimensions(x)
@@ -298,36 +289,48 @@ def main():
                     runtimes_dft[i] = (end - start)
 
                 print("\tRunning trial " + str(i))
-            # dft_data[dft_counter] = np.average(runtimes_dft)
+
+            # Computing average and standart deviation of runtimes.
             average_runtime_fft = np.average(runtimes_fft)
             std_runtime_fft = np.std(runtimes_fft)
+
+            # Storing the data points in the fft_data and fft_data_std arrays.
             fft_data[counter] = average_runtime_fft
             fft_data_std[counter] = std_runtime_fft
 
+            # If statement to prevent computation of 2D DFT as it takes too long for inputs of size 128x128.
             if exponent <= 6:
+                # Computing average and standart deviation of runtimes.
                 average_runtime_dft = np.average(runtimes_dft)
                 std_runtime_dft = np.std(runtimes_dft)
+
+                # Storing the data points in the dft_data and dft_data_std arrays.
                 dft_data[counter] = average_runtime_dft
                 dft_data_std[counter] = std_runtime_dft
-                x_axis_data[counter] = 2**exponent
 
+                # Printing Average Runtime and Standard Deviation for 2D DFT.
+                print("\t2D DFT:\tAverage Runtime: " + str(average_runtime_dft) +
+                      "\tRuntime Standard Deviation: " + str(std_runtime_dft))
+
+            # Storing input sizes for the x-axis.
             x_axis_data[counter] = 2**exponent
 
-            print("\t2D DFT:\tAverage Runtime: " + str(average_runtime_dft) + "\tRuntime Standard Deviation: " + str(std_runtime_dft))
-            print("\t2D FFT:\tAverage Runtime: " + str(average_runtime_fft) + "\tRuntime Standard Deviation: " + str(std_runtime_fft) + "\n")
-            counter+=1
-            exponent+=1
+            # Printing Average Runtime and Standard Deviation for 2D FFT.
+            print("\t2D FFT:\tAverage Runtime: " + str(average_runtime_fft) +
+                  "\tRuntime Standard Deviation: " + str(std_runtime_fft) + "\n")
 
-        # plt.errorbar(fft_data.shape[0], fft_data.shape[1], yerr=10, fmt='r--')
+            # Incrementing counter and exponent.
+            counter += 1
+            exponent += 1
+
+        # Plotting both 2D FFT and 2D DFT.
         plt.errorbar(x_axis_data, fft_data, yerr=(fft_data_std*2), fmt='r--')
-        plt.errorbar(x_axis_data[0:2], dft_data, yerr=(dft_data_std*2), fmt='g--')
-        fig.suptitle(
-            "Mode 3: Runtime Over Problem Size")
-        # print(x)
-        # print(fft_data)
+        plt.errorbar(x_axis_data[0:2], dft_data,yerr=(dft_data_std*2), fmt='g--')
         plt.show()
+    
+    # Invalid Mode.
     else:
-        print("hello")
+        print("Error:\t There are only 4 modes that this program works in.")
 
 
 def parser():
@@ -337,6 +340,7 @@ def parser():
     parser.add_argument('-i', action='store', dest='image',
                         help='Filename of the image we wish to take the DFT of', type=str, default='moonlanding.png')
     return parser.parse_args()
+
 
 if __name__ == "__main__":
     main()
