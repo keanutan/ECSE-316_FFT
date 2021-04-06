@@ -184,15 +184,29 @@ def main():
         print("For 80% compression, we have {} non-zero Fourier coefficients.".format(524288 - count_d))
         print("For 95% compression, we have {} non-zero Fourier coefficients.".format(524288 - count_e))
 
-        # Saving compressed arrays as files.
+        # Saving compressed arrays as .txt files and .npz files to better see file size difference.
+        name = "compressed_" + str(int(20)) + ".txt"
+        np.savetxt(name, transient_img_a)
         name = "compressed_" + str(int(20))
         save_npz(name, csr_matrix(transient_img_a))
+
+        name = "compressed_" + str(int(40)) + ".txt"
+        np.savetxt(name, transient_img_b)
         name = "compressed_" + str(int(40))
         save_npz(name, csr_matrix(transient_img_b))
+
+        name = "compressed_" + str(int(60)) + ".txt"
+        np.savetxt(name, transient_img_c)
         name = "compressed_" + str(int(60))
         save_npz(name, csr_matrix(transient_img_c))
+
+        name = "compressed_" + str(int(80)) + ".txt"
+        np.savetxt(name, transient_img_d)
         name = "compressed_" + str(int(80))
         save_npz(name, csr_matrix(transient_img_d))
+
+        name = "compressed_" + str(int(95)) + ".txt"
+        np.savetxt(name, transient_img_e)
         name = "compressed_" + str(int(95))
         save_npz(name, csr_matrix(transient_img_e))
 
@@ -243,7 +257,7 @@ def main():
         fig, ax = plt.subplots()
         ax.set_xlabel('Problem Size NxN')
         ax.set_ylabel('Runtime In Seconds')
-        ax.set_title('Mode 3: Runtime Over Problem Size')
+        ax.set_title('Mode 4: Runtime Over Problem Size')
 
         # Setting up our testing parameters with initial exponent, the number of trials per input,
         # the counter for adding plot points at each exponent, and the initial data arrays for
@@ -271,19 +285,22 @@ def main():
             # Data arrays for both 2D Fourier Transforms.
             runtimes_dft = np.zeros(10)
             runtimes_fft = np.zeros(10)
+            
+            # Setting up the random 2D array of size 2^exponent x 2^exponent.
+            x = np.random.rand(2**exponent, 2**exponent)
 
             # Doing 10 independent trials with 10 different inputs.
             for i in range(10):
-
-                # Setting up the random 2D array of size 2^exponent x 2^exponent.
-                x = np.random.rand(2**exponent, 2**exponent)
-
+                
+                # Computing runtime for 2D FFT.
                 start = time.time()
                 DFT.FFT_Two_Dimensions(x)
                 end = time.time()
                 runtimes_fft[i] = (end - start)
+
+                # If statement to prevent computation of 2D DFT as it takes too long for inputs of size 128x128.
                 if exponent <= 6:
-                    # for j in range(1):
+                    # Computing runtime for 2D DFT.
                     start = time.time()
                     DFT.DFT_Two_Dimensions(x)
                     end = time.time()
