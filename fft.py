@@ -185,6 +185,7 @@ def main():
         print("For 95% compression, we have {} non-zero Fourier coefficients.".format(524288 - count_e))
 
         # Saving compressed arrays as .txt files and .npz files to better see file size difference.
+        # Nope: We also save .npz files because file size difference is more apparent.
         name = "compressed_" + str(int(20)) + ".txt"
         np.savetxt(name, transient_img_a)
         name = "compressed_" + str(int(20))
